@@ -1,0 +1,15 @@
+---
+- hosts: linode
+  remote_user: jonathan
+  become: true
+  vars_files: [group_vars/linode]
+  tasks:
+    - name: add zsh
+      apt:
+        update_cache: yes
+        name: zsh
+    - name: set shell to zsh
+      user: name=jonathan shell=/bin/zsh
+  roles: 
+    - geerlingguy.firewall
+    - geerlingguy.security
