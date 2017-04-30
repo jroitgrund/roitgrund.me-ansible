@@ -1,8 +1,7 @@
 ---
-- hosts: linode
+- hosts: all
   remote_user: jonathan
   become: true
-  vars_files: [group_vars/linode]
   tasks:
     - name: add zsh
       apt:
@@ -10,6 +9,7 @@
         name: zsh
     - name: set shell to zsh
       user: name=jonathan shell=/bin/zsh
-  roles: 
+  roles:
+    - ANXS.hostname
     - geerlingguy.firewall
     - geerlingguy.security

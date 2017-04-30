@@ -1,0 +1,22 @@
+---
+- hosts: load-balancers
+  remote_user: jonathan
+  become: true
+  vars:
+    nginx_sites:
+     default:
+         - listen 80
+         - server_name linode.roitgrund.me
+         - return 301 http://www.linode.roitgrund.me$request_uri
+     www:
+         - listen 80
+         - server_name www.linode.roitgrund.me
+         - location ^~ /.well-known/acme-challenge/ { root /var/www/letsencrypt; default_type "text/plain"; allow all; }
+  tasks:
+    - name: letsencrypt
+      command: letsencrypt certonly -n -v --webroot --agree-tos -w /var/www/letsencrypt -d {{ inventory_hostname }} -d www.{{ inventory_hostname }}
+      args:
+        creates: /var/www/letsencrypt/.well-known/acme-challenge
+  roles:
+    - geerlingguy.certbot
+    - jdauphant.nginx

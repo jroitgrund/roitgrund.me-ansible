@@ -1,7 +1,6 @@
 ---
 - hosts: not-bootstrapped
   remote_user: root
-  vars_files: [group_vars/all]
   tasks:
     - name: add jonathan user
       user: name=jonathan

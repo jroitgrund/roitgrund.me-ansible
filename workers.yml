@@ -1,0 +1,6 @@
+---
+- hosts: workers
+  remote_user: jonathan
+  become: true
+  tasks: []
+  roles: []

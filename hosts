@@ -1,6 +1,8 @@
-[linode]
-151.236.218.114
-139.162.233.5
-139.162.241.74
+[workers]
+linode1.roitgrund.me
+linode2.roitgrund.me
+linode3.roitgrund.me
+
+[load-balancers]
 
 [not-bootstrapped]
