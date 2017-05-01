@@ -9,6 +9,12 @@
         name: zsh
     - name: set shell to zsh
       user: name=jonathan shell=/bin/zsh
+    - name: download oh-my-zsh
+      become: false
+      shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+      args:
+        creates: .oh-my-zsh
+
   roles:
     - ANXS.hostname
     - geerlingguy.firewall
