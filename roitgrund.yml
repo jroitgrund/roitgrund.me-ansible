@@ -1,0 +1,100 @@
+---
+- hosts: roitgrund
+  remote_user: root
+  gather_facts: no
+
+  pre_tasks:
+    - name: install python2
+      raw: sudo apt-get -y install python-simplejson
+
+- hosts: roitgrund
+  remote_user: root
+
+  tasks:
+    - name: add jonathan user
+      user: name=jonathan
+    - name: add ssh key
+      authorized_key: key="{{ lookup('file', 'id_rsa.pub') }}" user=jonathan
+
+    - name: add zsh
+      apt:
+        update_cache: yes
+        name: zsh
+
+    - name: set shell to zsh
+      user: name=jonathan shell=/bin/zsh
+
+    - name: add certbot repo
+      apt_repository:
+        repo: 'ppa:certbot/certbot'
+
+    - name: install certbot
+      package:
+        name: python-certbot-nginx
+        state: latest
+
+- hosts: roitgrund
+  remote_user: root
+  roles:
+    - geerlingguy.security
+
+- hosts: roitgrund
+  remote_user: jonathan
+  become: true
+
+  vars:
+    nginx_sites:
+     https:
+         - listen 80
+         - server_name *.{{ inventory_hostname }}
+         - location ^~ /.well-known/acme-challenge/ { root /var/www/letsencrypt; default_type "text/plain"; allow all; }
+         - location / { return 301 https://$host$request_uri; }
+
+  roles:
+    - ANXS.hostname
+    - geerlingguy.firewall
+    - jdauphant.nginx
+
+- hosts: roitgrund
+  remote_user: jonathan
+  become: true
+
+  tasks:
+    - name: create letsencrypt dir
+      file:
+        path: /var/www/letsencrypt
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: 2775
+
+    - name: certbot
+      command: certbot certonly -n -v --webroot --email jroitgrund@gmail.com --agree-tos -w /var/www/letsencrypt -d {{ inventory_hostname }}
+      args:
+        creates: /var/www/letsencrypt/.well-known/acme-challenge
+
+    - name: "Add cron job for certbot renewal (if configured)"
+      cron:
+        name: "certbot"
+        job: "certbot renew --quiet --no-self-upgrade"
+        minute: 30
+        hour: 3
+        user: "{{ ansible_user }}"
+
+- hosts: roitgrund
+  remote_user: jonathan
+  become: true
+
+  vars:
+    nginx_sites:
+     roitgrund:
+         - listen 443 ssl http2 default_server
+         - ssl_certificate /etc/letsencrypt/live/{{ inventory_hostname }}/fullchain.pem
+         - ssl_certificate_key /etc/letsencrypt/live/{{ inventory_hostname }}/privkey.pem
+         - include /usr/lib/python2.7/dist-packages/certbot_nginx/options-ssl-nginx.conf
+         - server_name {{ inventory_hostname }}
+         - root /var/www/html
+         - index index.nginx-debian.html
+
+  roles:
+    - jdauphant.nginx

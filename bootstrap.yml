@@ -1,8 +1,0 @@
----
-- hosts: not-bootstrapped
-  remote_user: root
-  tasks:
-    - name: add jonathan user
-      user: name=jonathan
-    - name: add ssh key
-      authorized_key: key="{{ lookup('file', '~/.ssh/id_rsa.pub') }}" user=jonathan

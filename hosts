@@ -1,8 +1,2 @@
-[workers]
-linode1.roitgrund.me
-linode2.roitgrund.me
-linode3.roitgrund.me
-
-[load-balancers]
-
-[not-bootstrapped]
+[roitgrund]
+any.digitalocean.roitgrund.me
