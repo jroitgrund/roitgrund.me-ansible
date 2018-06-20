@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+
+    <script type="text/javascript" src="GPU.js"></script>
+    <script type="text/javascript" src="Mem.js"></script>
+    <script type="text/javascript" src="CPU.js"></script>
+    <script type="text/javascript" src="Main.js"></script>
+
+    <meta charset="UTF-8">
+
+    <title>Chip 16 emulator</title>
+
+    <style type="text/css">
+      h1
+      {
+        margin:0
+      }
+      h2
+      {
+        margin:0;
+      }
+      a,a:link,a:visited
+      {
+        color:inherit;
+        text-decoration:underline
+      }
+      a:hover, a:active
+      {
+        color:red;
+        text-decoration:none
+      }
+      body
+      {
+        font-family:Helvetica;
+        color:#333333;
+        margin:0 auto;
+        padding:0 1%;
+        width:960px;
+        background-color:white;
+        min-height:99%
+      }
+      html
+      {
+        background-color:black;
+        height:100%
+      }
+      ul
+      {
+        padding-left:15px;
+        margin-top:0
+      }
+      #emu
+      {
+        float:left;
+        width:49%;
+      }
+      #debug
+      {
+        float:left;
+        width:49%;
+        margin-left:2%;
+        font-family:Courier
+      }
+      #debugl
+      {
+        float:left;
+        width:47%;
+        margin-left:2%
+      }
+      #debugr
+      {
+        float:left;
+        width:47%;
+        margin-left:2%
+      }
+      #main, #roms, #footer
+      {
+        margin-top:5px;
+        padding:5px; 
+      }
+      .clear
+      {
+        clear:both;
+        height:0
+      }
+      #demos
+      {
+        float:left;
+        width:32%;
+      }
+      #games
+      {
+        float:left;
+        width:32%;
+        margin-left:2%
+      }
+      #controls
+      {
+        float:left;
+        width:32%;
+        margin-left:2%
+      }
+      #screen
+      {
+        border:thick solid #225533
+      }
+    </style>
+
+  </head>
+
+    <body onload="Main.event_handler()">
+
+
+    <div id="main">
+      <h1>JavaScript CHIP16 emulator</h1>
+      <div id="emu">
+        <canvas id="screen" width="320" height="240"></canvas><br>
+        <a href="javascript:" onclick="Main.step()">Step</a><br>
+        <a href="javascript:" id="pause" onclick="Main.resume()">Play / Pause</a><br>
+      </div>
+      <div id="debug">
+        <h2>Debug info</h2>
+          <div id="debugl">
+            R0: <span id="r0"></span><br>
+            R1: <span id="r1"></span><br>
+            R2: <span id="r2"></span><br>
+            R3: <span id="r3"></span><br>
+            R4: <span id="r4"></span><br>
+            R5: <span id="r5"></span><br>
+            R6: <span id="r6"></span><br>
+            R7: <span id="r7"></span><br>
+            R8: <span id="r8"></span><br>
+            R9: <span id="r9"></span><br>
+            RA: <span id="r10"></span<br>
+          </div>
+          <div id="debugr">
+            RB: <span id="r11"></span><br>
+            RC: <span id="r12"></span><br>
+            RD: <span id="r13"></span><br>
+            RE: <span id="r14"></span><br>
+            RF: <span id="r15"></span><br>
+            PC: <span id="pc"></span><br>
+            SP: <span id="sp"></span><br>
+            C: <span id="c"></span><br>
+            Z: <span id="z"></span><br>
+            O: <span id="o"></span><br>
+            N: <span id="n"></span><br>
+          </div>
+        </div>
+        <div class="clear"></div>
+      </div>
+      <div id="roms">
+        <div id="demos">
+          <h2>Demo roms</h2>
+          <ul>
+            <li><a href="javascript:" onclick="Main.init('Anim.c16')">Animation</a></li>
+            <li><a href="javascript:" onclick="Main.init('ASCII.c16')">ASCII</a></li>
+            <li><a href="javascript:" onclick="Main.init('Ball.c16')">Ball</a></li>
+            <li><a href="javascript:" onclick="Main.init('boing.c16')">Boing</a></li>
+            <li><a href="javascript:" onclick="Main.init('CollisionTest.c16')">Collision Test</a></li>
+            <li><a href="javascript:" onclick="Main.init('dots2.c16')">Dots 2</a></li>
+            <li><a href="javascript:" onclick="Main.init('flip_test.c16')">Flip test</a></li>
+            <li><a href="javascript:" onclick="Main.init('GB16.c16')">GB 16</a></li>
+            <li><a href="javascript:" onclick="Main.init('Intro.c16')">Intro</a></li>
+            <li><a href="javascript:" onclick="Main.init('Mandel.c16')">Mandel</a></li>
+            <li><a href="javascript:" onclick="Main.init('Maze.c16')">Maze</a></li>
+            <li><a href="javascript:" onclick="Main.init('paletteflip.c16')">PaletteFlip</a></li>
+            <li><a href="javascript:" onclick="Main.init('Starfield.c16')">Starfield</a></li>
+            <li><a href="javascript:" onclick="Main.init('Static.c16')">Static</a></li>
+            <li><a href="javascript:" onclick="Main.init('Stopwatch.c16')">Stopwatch</a></li>
+            <li><a href="javascript:" onclick="Main.init('Triangle.c16')">Triangle</a></li>
+            <li><a href="javascript:" onclick="Main.init('water.c16')">Water</a></li>
+            <li><a href="javascript:" onclick="Main.init('xor.c16')">Xor</a></li>
+          </ul>
+        </div>
+        <div id="games">
+          <h2>Game roms</h2>
+          <ul>
+            <li><a href="javascript:" onclick="Main.init('bruised (Beta).c16')">Bruised (press select, not start)</a></li>
+            <li><a href="javascript:" onclick="Main.init('Herdle.c16')">Herdle</a></li>
+            <li><a href="javascript:" onclick="Main.init('MegaManX16.c16')">MegaManX</a></li>
+            <li><a href="javascript:" onclick="Main.init('Ninja.c16')">Ninja</a></li>
+            <li><a href="javascript:" onclick="Main.init('Pong.c16')">Pong</a></li>
+            <li><a href="javascript:" onclick="Main.init('Reflection.c16')">Reflection</a></li>
+            <li><a href="javascript:" onclick="Main.init('Snafu.c16')">Snafu</a></li>
+          </ul>
+        </div>
+        <div id="controls">
+          <h2>Controls:</h2>
+          Arrow keys: up, down, left, right<br>
+          Z: A<br>
+          X: B<br>
+          Select: Shift<br>
+          Start: Enter<br>
+        </div>
+        <div class="clear"></div>
+      </div>
+      <div id="footer">
+        All ROMs were developed by members of the <a href="http://www.ngemu.com/forums/showthread.php?t=145620">ngemu forums</a>
+      </div>
+
+
+  </body>
+
+</html>

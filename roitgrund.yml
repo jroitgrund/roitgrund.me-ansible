@@ -4,21 +4,14 @@
   become: true
 
   tasks:
-    - name: create html root dir
-      file:
-        path: /var/www/html
-        state: directory
-        owner: www-data
-        group: www-data
-        mode: 02770
-
-    - name: add index file
+    - name: copy html dir
       copy:
-        src: index.html
-        dest: /var/www/html/index.html
+        src: html
+        dest: /var/www
         owner: www-data
         group: www-data
-        mode: 0660
+        directory_mode: 02750
+        mode: 0640
 
   vars:
     nginx_sites:
