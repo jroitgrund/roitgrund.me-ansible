@@ -1,0 +1,27 @@
+---
+- hosts: all
+  remote_user: jonathan
+  become: true
+
+  vars:
+    postgresql_databases:
+      - name: passmein
+        owner: passmein
+      - name: chinema
+        owner: chinema
+    postgresql_users:
+      - name: passmein
+      - name: chinema
+
+  tasks:
+    - name: add chinema user
+      user:
+        name: chinema
+        system: yes
+    - name: add passmein user
+      user:
+        name: passmein
+        system: yes
+
+  roles:
+    - ANXS.postgresql

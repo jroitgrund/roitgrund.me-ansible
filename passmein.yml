@@ -1,0 +1,77 @@
+---
+- hosts: all
+  remote_user: jonathan
+  become: true
+
+  tasks:
+    - name: Install bundler
+      apt:
+        name: ruby-bundler
+
+    - name: Install ruby dev
+      apt:
+        name: ruby-all-dev
+
+    - name: Install build essential
+      apt:
+        name: build-essential
+
+    - name: Install libpq-dev
+      apt:
+        name: libpq-dev
+
+    - name: Install nodejs
+      apt:
+        name: nodejs
+
+- hosts: all
+  remote_user: jonathan
+  become: true
+  become_user: passmein
+
+  tasks:
+    - name: clone passmein
+      git:
+        repo: https://github.com/jroitgrund/passmein.git
+        dest: /home/passmein/passmein
+
+    - name: bundle install
+      command: bundle install --path vendor/bundle
+      args:
+        creates: vendor/bundle
+        chdir: /home/passmein/passmein
+
+    - name: migrate
+      command: bundle exec rake db:migrate
+      args:
+        chdir: /home/passmein/passmein
+      environment:
+        RAILS_ENV: production
+
+    - name: build assets
+      command: bundle exec rake assets:precompile
+      args:
+        creates: /home/passmein/passmein/assets/public
+        chdir: /home/passmein/passmein
+      environment:
+        RAILS_ENV: production
+
+- hosts: all
+  remote_user: jonathan
+  become: true
+
+  tasks:
+    - name: add systemd unit file
+      copy:
+        src: passmein.service
+        dest: /etc/systemd/system/passmein.service
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: start service
+      systemd:
+        state: started
+        daemon_reload: yes
+        name: passmein
+        enabled: yes

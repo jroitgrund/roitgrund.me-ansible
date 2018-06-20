@@ -1,0 +1,21 @@
+---
+- hosts: all
+  remote_user: root
+  gather_facts: no
+
+  pre_tasks:
+    - name: install python2
+      raw: sudo apt-get -y install python-simplejson
+
+- hosts: all
+  remote_user: root
+  tasks:
+    - name: Install zsh
+      apt:
+        name: zsh
+
+    - name: add jonathan user
+      user: name=jonathan shell=/bin/zsh
+
+    - name: add ssh key
+      authorized_key: key="{{ lookup('file', 'id_rsa.pub') }}" user=jonathan

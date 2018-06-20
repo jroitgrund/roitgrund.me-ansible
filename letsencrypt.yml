@@ -1,0 +1,70 @@
+---
+- hosts: all
+  remote_user: jonathan
+  become: true
+
+  tasks:
+    - name: add acme user
+      user: name=acme shell=/bin/zsh
+
+    - name: grant acme user nginx reload permissions
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        line: 'acme ALL=(ALL) NOPASSWD: /bin/systemctl reload nginx.service'
+        validate: '/usr/sbin/visudo -cf %s'
+
+    - name: create acme-challenge dir
+      file:
+        path: /home/acme/acme-challenge
+        state: directory
+        owner: acme
+        group: www-data
+        mode: 02750
+
+    - name: create certs dir
+      file:
+        path: /home/acme/certs
+        state: directory
+        owner: acme
+        group: www-data
+        mode: 02750
+
+  vars:
+    nginx_sites:
+     letsencrypt:
+         - listen 80
+         - server_name {{ inventory_hostname }}
+         - location /.well-known/acme-challenge/ { root /home/acme/acme-challenge; }
+         - location / { return 301 https://$host$request_uri; }
+
+  roles:
+    - jdauphant.nginx
+
+- hosts: all
+  remote_user: jonathan
+  become: yes
+  become_user: acme
+
+  tasks:
+    - name: install acme.sh
+      command: /bin/zsh -ic 'curl https://get.acme.sh | sh'
+      args:
+        creates: /home/acme/.acme.sh
+        chdir: /home/acme
+
+- hosts: all
+  remote_user: jonathan
+  become: yes
+  become_user: acme
+
+  tasks:
+    - name: issue cert
+      command: /bin/zsh -ic 'acme.sh --issue -d {{ inventory_hostname }} -w /home/acme/acme-challenge'
+      args:
+        creates: /home/acme/.acme.sh/{{ inventory_hostname }}
+
+    - name: install cert
+      command: /bin/zsh -ic 'acme.sh --install-cert -d {{ inventory_hostname }} --key-file /home/acme/certs/key.pem  --fullchain-file /home/acme/certs/cert.pem --reloadcmd "sudo systemctl reload nginx.service"'
+      args:
+        creates: /home/acme/certs/cert.pem
