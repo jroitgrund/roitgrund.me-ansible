@@ -30,6 +30,8 @@
           - index index.html
           - location = /passmein { return 301 /passmein/; }
           - location /passmein/ { proxy_pass http://localhost:8000/; }
+          - location = /chinema { return 301 http://chinema/; }
+          - location /chinema/ { proxy_pass http://localhost:8001; proxy_set_header Host $http_host; proxy_set_header X-Forwarded-Proto $scheme;}
 
   roles:
     - jdauphant.nginx

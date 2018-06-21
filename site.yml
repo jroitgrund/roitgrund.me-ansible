@@ -1,6 +1,8 @@
-# - include: jonathan.yml
-# - include: security.yml
-- include: letsencrypt.yml
-- include: roitgrund.yml
-- include: postgres.yml
-- include: passmein.yml
+- import_playbook: jonathan.yml
+- import_playbook: security.yml
+- import_playbook: letsencrypt.yml
+- import_playbook: roitgrund.yml
+- import_playbook: postgres.yml
+- import_playbook: node.yml
+- import_playbook: passmein.yml
+- import_playbook: chinema.yml

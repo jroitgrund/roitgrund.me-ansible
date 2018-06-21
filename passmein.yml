@@ -12,17 +12,9 @@
       apt:
         name: ruby-all-dev
 
-    - name: Install build essential
-      apt:
-        name: build-essential
-
     - name: Install libpq-dev
       apt:
         name: libpq-dev
-
-    - name: Install nodejs
-      apt:
-        name: nodejs
 
 - hosts: all
   remote_user: jonathan

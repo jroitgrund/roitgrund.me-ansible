@@ -1,0 +1,15 @@
+[Unit]
+Description=chinema
+Requires=network.target
+
+[Service]
+Type=simple
+User=chinema
+Group=chinema
+WorkingDirectory=/home/chinema/chineurs
+ExecStart=/bin/zsh -ic '. /home/chinema/chinema-venv/bin/activate ; gunicorn -e SCRIPT_NAME=/chinema chineurs.main:APP -b localhost:8001 --error-logfile - --log-file - --access-logfile -'
+TimeoutSec=30
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

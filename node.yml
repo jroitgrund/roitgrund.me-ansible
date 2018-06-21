@@ -1,0 +1,27 @@
+---
+- hosts: all
+  remote_user: jonathan
+  become: true
+
+  tasks:
+    - name: Add node repo
+      shell: curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+
+    - name: Add yarn key
+      shell: curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+
+    - name: Add yarn repo
+      shell: echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+
+    - name: Install node
+      apt:
+        name: nodejs
+
+    - name: Install yarn
+      apt:
+        name: yarn
+        update_cache: yes
+
+    - name: Install build essential
+      apt:
+        name: build-essential

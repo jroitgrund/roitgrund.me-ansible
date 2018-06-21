@@ -1,0 +1,15 @@
+[Unit]
+Description=chinema-celery
+Requires=network.target
+
+[Service]
+Type=simple
+User=chinema
+Group=chinema
+WorkingDirectory=/home/chinema/chineurs
+ExecStart=/bin/zsh -ic '. /home/chinema/chinema-venv/bin/activate ; celery -A chineurs.celery worker'
+TimeoutSec=30
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

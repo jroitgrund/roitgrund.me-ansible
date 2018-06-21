@@ -1,0 +1,108 @@
+---
+- hosts: all
+  remote_user: jonathan
+  become: true
+
+  tasks:
+    - name: Install venv
+      apt:
+        name: python3-venv
+
+    - name: Install python dev
+      apt:
+        name: python3-dev
+
+    - name: Install rabbitmq
+      apt:
+        name: rabbitmq-server
+
+    - name: Install libsass
+      apt:
+        name: libsass0
+
+    - name: start rabbitmq
+      systemd:
+        state: started
+        daemon_reload: yes
+        name: rabbitmq-server
+        enabled: yes
+
+- hosts: all
+  remote_user: jonathan
+  become: true
+  become_user: chinema
+
+  tasks:
+    - name: clone chinema
+      git:
+        repo: https://github.com/jroitgrund/chineurs.git
+        dest: /home/chinema/chineurs
+
+    - name: install deps
+      pip:
+        requirements: /home/chinema/chineurs/requirements.txt
+        virtualenv: /home/chinema/chinema-venv
+        virtualenv_command: pyvenv
+
+    - name: install chinema
+      pip:
+        name: file:///home/chinema/chineurs
+        virtualenv: /home/chinema/chinema-venv
+        virtualenv_command: pyvenv
+
+    - name: install frontend deps
+      npm:
+        path: /home/chinema/chineurs/chineurs/frontend
+
+    - name: build frontend
+      shell: npm run build
+      args:
+        chdir: /home/chinema/chineurs/chineurs/frontend
+
+    - name: migrate db
+      shell: /bin/zsh -ic '. /home/chinema/chinema-venv/bin/activate ; yoyo apply'
+      args:
+        chdir: /home/chinema/chineurs
+
+    - name: copy configuration
+      copy:
+        src: .env
+        dest: /home/chinema/chineurs/.env
+        owner: chinema
+        group: chinema
+        mode: 0750
+
+- hosts: all
+  remote_user: jonathan
+  become: true
+
+  tasks:
+    - name: add systemd unit file
+      copy:
+        src: chinema.service
+        dest: /etc/systemd/system/chinema.service
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: add celery systemd unit file
+      copy:
+        src: chinema-celery.service
+        dest: /etc/systemd/system/chinema-celery.service
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: start celery service
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: chinema-celery
+        enabled: yes
+
+    - name: start service
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: chinema
+        enabled: yes
