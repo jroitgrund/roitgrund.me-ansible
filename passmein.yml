@@ -25,6 +25,7 @@
     - name: clone passmein
       git:
         repo: https://github.com/jroitgrund/passmein.git
+        force: yes
         dest: /home/passmein/passmein
 
     - name: bundle install
@@ -63,7 +64,7 @@
 
     - name: start service
       systemd:
-        state: started
+        state: restarted
         daemon_reload: yes
         name: passmein
         enabled: yes

@@ -36,6 +36,7 @@
     - name: clone chinema
       git:
         repo: https://github.com/jroitgrund/chineurs.git
+        force: yes
         dest: /home/chinema/chineurs
 
     - name: install deps
