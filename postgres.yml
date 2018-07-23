@@ -22,6 +22,10 @@
       user:
         name: passmein
         system: yes
+    - name: add discogs user
+      user:
+        name: discogs
+        system: yes
 
   roles:
     - ANXS.postgresql

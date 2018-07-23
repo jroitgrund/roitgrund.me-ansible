@@ -1,0 +1,59 @@
+---
+- hosts: all
+  remote_user: jonathan
+  become: true
+
+  tasks:
+    - name: Install redis
+      apt:
+        name: redis-server
+
+- hosts: all
+  remote_user: jonathan
+  become: true
+  become_user: discogs
+
+  tasks:
+    - name: clone discogs
+      git:
+        repo: https://gitlab.com/jroitgrund/discogs-clone.git
+        force: yes
+        dest: /home/discogs/discogs
+
+    - name: yarn
+      command: yarn
+      args:
+        chdir: /home/discogs/discogs
+
+    - name: yarn
+      command: yarn build
+      args:
+        chdir: /home/discogs/discogs
+
+    - name: copy configuration
+      copy:
+        src: .discogs-env
+        dest: /home/discogs/discogs/.env
+        owner: discogs
+        group: discogs
+        mode: 0750
+
+- hosts: all
+  remote_user: jonathan
+  become: true
+
+  tasks:
+    - name: add systemd unit file
+      copy:
+        src: discogs.service
+        dest: /etc/systemd/system/discogs.service
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: start service
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: discogs
+        enabled: yes

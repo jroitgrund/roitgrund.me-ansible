@@ -67,7 +67,7 @@
 
     - name: copy configuration
       copy:
-        src: .env
+        src: .chinema-env
         dest: /home/chinema/chineurs/.env
         owner: chinema
         group: chinema
