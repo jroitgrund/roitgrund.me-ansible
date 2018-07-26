@@ -7,7 +7,7 @@ Type=simple
 User=discogs
 Group=discogs
 WorkingDirectory=/home/discogs/discogs
-ExecStart=/usr/bin/node lib/main/typescript/index.js
+ExecStart=/usr/bin/node server/lib/main/typescript/index.js
 Environment="NODE_ENV=production"
 TimeoutSec=30
 Restart=always

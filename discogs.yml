@@ -20,13 +20,13 @@
         force: yes
         dest: /home/discogs/discogs
 
-    - name: yarn
+    - name: yarn install
       command: yarn
       args:
         chdir: /home/discogs/discogs
 
-    - name: yarn
-      command: yarn build
+    - name: yarn dist
+      command: yarn dist
       args:
         chdir: /home/discogs/discogs
 
