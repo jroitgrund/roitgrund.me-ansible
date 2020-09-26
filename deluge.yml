@@ -1,0 +1,47 @@
+---
+- hosts: all
+  remote_user: jonathan
+  become: true
+
+  tasks:
+    - name: Install deluged
+      apt:
+        name: deluged
+
+    - name: Install deluge-web
+      apt:
+        name: deluge-web
+
+    - name: Enable deluged
+      lineinfile:
+        path: /etc/default/deluged
+        regexp: '^ENABLE_DELUGED='
+        line: ENABLE_DELUGED=1
+
+    - name: Start service
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: deluged
+        enabled: yes
+
+    - name: add systemd unit file
+      copy:
+        src: deluge-web.service
+        dest: /etc/systemd/system/deluge-web.service
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Start web service
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: deluge-web
+        enabled: yes
+
+    - name: Add nginx to debian-deluged
+      user:
+        name: www-data
+        groups: debian-deluged
+        append: yes

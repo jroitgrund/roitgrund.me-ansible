@@ -8,14 +8,15 @@
       file:
         path: /etc/nginx/sites-available/default
         state: absent
-    - name: copy html dir
+    
+    - name: add .htpasswd
       copy:
-        src: html
-        dest: /var/www
-        owner: www-data
-        group: www-data
-        directory_mode: 02750
-        mode: 0640
+        src: .htpasswd
+        dest: /etc/nginx/.htpasswd
+        owner: root
+        group: root
+        mode: 0755
+        decrypt: yes
 
   vars:
     nginx_configs:
@@ -34,14 +35,17 @@
           - ssl_prefer_server_ciphers on
           - proxy_cache one
           - server_name {{ inventory_hostname }}
-          - root /var/www/html
-          - index index.html
           - location = /passmein { return 301 /passmein/; }
           - location /passmein/ { proxy_pass http://localhost:8000/; }
           - location = /chinema { return 301 /chinema/; }
           - location /chinema/ { proxy_pass http://localhost:8001; proxy_set_header Host $http_host; proxy_set_header X-Forwarded-Proto $scheme;}
           - location = /discogs { return 301 /discogs/; }
           - location /discogs/ { proxy_pass http://localhost:3000; }
+          - location = /chip16 { return 301 /chip16/; }
+          - location / { return 301 https://jroitgrund.github.io/; }
+          - location /deluge { proxy_pass http://localhost:8112/; proxy_set_header X-Deluge-Base "/deluge/"; add_header X-Frame-Options SAMEORIGIN; }
+          - location = /downloads { return 301 /downloads/; }
+          - location /downloads/ { alias /var/lib/deluged/Downloads/; autoindex on; auth_basic "Welcome" ; auth_basic_user_file /etc/nginx/.htpasswd; }
 
   roles:
     - jdauphant.nginx

@@ -2,23 +2,6 @@
 - hosts: all
   remote_user: jonathan
   become: true
-
-  tasks:
-    - name: Install bundler
-      apt:
-        name: ruby-bundler
-
-    - name: Install ruby dev
-      apt:
-        name: ruby-all-dev
-
-    - name: Install libpq-dev
-      apt:
-        name: libpq-dev
-
-- hosts: all
-  remote_user: jonathan
-  become: true
   become_user: passmein
 
   tasks:

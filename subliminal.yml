@@ -1,0 +1,27 @@
+- hosts: all
+  remote_user: jonathan
+  become: true
+
+  tasks:
+    - name: Install pip
+      apt:
+        name: python3-pip
+        append: yes
+
+- hosts: all
+  remote_user: jonathan
+  become_user: debian-deluged
+  become: true
+
+  tasks:
+    - name: Install subliminal
+      pip:
+        name: subliminal
+        virtualenv_command: pyvenv
+        virtualenv: /var/lib/deluged/.virtualenv
+  
+    - name: Add cronjob
+      cron:
+        name: Download subtitles
+        job: "/bin/bash -c 'source /var/lib/deluged/.virtualenv/bin/activate ; subliminal download -a 1h -l en /var/lib/deluged/Downloads'"
+        minute: "*/10"

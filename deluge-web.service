@@ -1,0 +1,15 @@
+[Unit]
+Description=deluge-web
+Requires=network.target
+
+[Service]
+Type=simple
+User=debian-deluged
+Group=debian-deluged
+WorkingDirectory=/var/lib/deluged
+ExecStart=/bin/bash -c '/usr/bin/deluge-web -c /var/lib/deluged/config'
+TimeoutSec=30
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
